@@ -1,29 +1,32 @@
-var path = require('path')
-var webpack = require('webpack')
+const path = require('path')
+const webpack = require('webpack')
 
+function resolve(dir) {
+  return path.join(__dirname, '..', dir)
+}
 module.exports = {
-  entry: './src/main.js',
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
-    filename: 'build.js'
+    filename: 'vue-count-to.min.js',
+    library: 'CountTo',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   module: {
-    rules: [
-      {
-        test: /\.css$/,
-        use: [
-          'vue-style-loader',
-          'css-loader'
-        ],
-      },      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
+    rules: [{
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [resolve('src'), resolve('test')],
         options: {
-          loaders: {
-          }
-          // other vue-loader options go here
+          formatter: require('eslint-friendly-formatter')
         }
+      },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
       },
       {
         test: /\.js$/,
@@ -41,19 +44,25 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
-    },
-    extensions: ['*', '.js', '.vue', '.json']
+      vue$: 'vue/dist/vue.esm.js'
+    }
+  },
+  externals: {
+    vue: {
+      root: 'Vue',
+      commonjs: 'vue',
+      commonjs2: 'vue',
+      amd: 'vue'
+    }
   },
   devServer: {
     historyApiFallback: true,
-    noInfo: true,
-    overlay: true
+    noInfo: true
   },
   performance: {
     hints: false
   },
-  devtool: '#eval-source-map'
+  devtool: '#source-map'
 }
 
 if (process.env.NODE_ENV === 'production') {
